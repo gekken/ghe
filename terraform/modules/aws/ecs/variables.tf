@@ -35,3 +35,28 @@ variable "ecs_ghe_public_cidr02" {
 ## to interpolate the CIDR notation   ##
 ## passing on this for now.           ##
 ########################################
+
+variable "ecs_gheCluster" {
+  description = "Cluster Name"
+  default = "testing"
+}
+
+variable "ecs_key_pair_name" {
+  description = "Name of the SSH Keypair"
+  default = "ssh_key_ecs_ghe"
+}
+
+variable "min_instance_size" {
+  description = "Minimum Number of ECS Instances"
+  default = 1
+}
+
+variable "max_instance_size" {
+  description = "Maximum Number of ECS Instances"
+  default = 4
+}
+
+variable "desired_capacity" {
+  description = "How Many do you Really Want?"
+  default = 2
+}
