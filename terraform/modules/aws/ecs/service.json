@@ -1,7 +1,7 @@
 [
   {
     "name": "Silly Example",
-    "image": "service-first",
+    "image": "gekken/silly-http:latest",
     "cpu": 10,
     "memory": 512,
     "essential": true,
