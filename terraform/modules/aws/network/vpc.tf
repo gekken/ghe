@@ -1,21 +1,32 @@
+# Find the availability_zones
+data "aws_availability_zones" "available" {}
+
 # Define the VPC
 
 resource "aws_vpc" "ecs_gheVPC" {
   cidr_block = "10.0.0.0/16"
   tags {
-    Name = "ecs_ecs_gheVPC"
+    Name = "ecs_gheVPC"
   }
 }
 
 # Define the Public Subnet
 
-resource "aws_subnet" "ecs_ghePSN" {
+resource "aws_subnet" "ecs_ghePSN01" {
   vpc_id = "${aws_vpc.ecs_gheVPC.id}"
   cidr_block = "10.0.0.0/24"
-  #TODO: Parameterize this! 
-  availability_zone = "us-west-2a"
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
   tags {
     Name = "ecs_ghePSN-1"
+  }
+}
+
+resource "aws_subnet" "ecs_ghePSN02" {
+  vpc_id = "${aws_vpc.ecs_gheVPC.id}"
+  cidr_block = "10.0.1.0/24"
+  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  tags {
+    Name = "ecs_ghePSN-2"
   }
 }
 
@@ -41,13 +52,29 @@ resource "aws_route_table" "ecs_ghePSN01-RT" {
   }
 }
 
+resource "aws_route_table" "ecs_ghePSN02-RT" {
+  vpc_id = "${aws_vpc.ecs_gheVPC.id}"
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.ecs_gheIG.id}"
+  }
+  tags {
+    Name = "ecs_ghePubSN02-RT"
+  }
+}
+
+
 # associate routing for ecs_ghePSN
 
-resource "aws_route_table_association" "ecs_ghePSN-RtAssc" {
-  subnet_id = "${aws_subnet.ecs_ghePSN.id}"
+resource "aws_route_table_association" "ecs_ghePSN01-RtAssc" {
+  subnet_id = "${aws_subnet.ecs_ghePSN01.id}"
   route_table_id = "${aws_route_table.ecs_ghePSN01-RT.id}"
 }
 
+resource "aws_route_table_association" "ecs_ghePSN02-RtAssc" {
+  subnet_id = "${aws_subnet.ecs_ghePSN02.id}"
+  route_table_id = "${aws_route_table.ecs_ghePSN02-RT.id}"
+}
 
 
 # Ingress SG
@@ -78,7 +105,10 @@ resource "aws_security_group" "ecs_ghePubSG" {
     from_port = 0
     to_port = 0
     protocol = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = [
+      "10.0.1.0/24",
+      "10.0.0.0/24"
+    ]
   }
 
   # Letting traffic out

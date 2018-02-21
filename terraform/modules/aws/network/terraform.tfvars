@@ -1,0 +1,5 @@
+region = "$region"
+ecs_gheVPC = "$ecs_gheVPC"
+ecs_ghe_network_cidr = "$ecs_ghe_network_cidr"
+ecs_ghe_public_cidr01 = "$ecs_ghe_public_cidr01"
+ecs_ghe_public_cidr02 = "$ecs_ghe_public_cidr02"
